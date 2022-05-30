@@ -13,7 +13,7 @@ const colors = {
 
 const fonts = {
   body: "Encode-Sans, sans-serif",
-  heading: "Georgia, serif",
+  heading: "Encode-Sans-Bold, serif",
   mono: "Menlo, monospace",
 };
 

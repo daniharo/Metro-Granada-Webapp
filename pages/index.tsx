@@ -1,7 +1,23 @@
 import type { NextPage } from "next";
-import { ChangeEventHandler, useCallback, useEffect, useState } from "react";
+import React, {
+  ChangeEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { ParadasAnswer } from "../src/types";
-import { Center, Input, Spinner } from "@chakra-ui/react";
+import {
+  Center,
+  Input,
+  Spinner,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import classes from "../styles/Home.module.css";
 
 interface Estimation {
@@ -17,6 +33,26 @@ interface Stop {
     Albolote: Estimation[];
   };
 }
+
+interface IEstimationsProps {
+  estimations: Estimation[];
+  defaultDestination: String;
+}
+const Estimations: React.FC<IEstimationsProps> = ({
+  estimations,
+  defaultDestination,
+}) => (
+  <span>
+    {estimations
+      .slice(0, 2)
+      .map((estimation) => {
+        const complement =
+          estimation.destination === defaultDestination ? "" : "*";
+        return `${estimation.minutes.toFixed(1)}${complement}'`;
+      })
+      .join(" - ")}
+  </span>
+);
 
 const getUniqueStationCode = (code: String) => +code.substring(0, 3);
 
@@ -98,35 +134,39 @@ const Home: NextPage = () => {
     normalizarString(parada.name).includes(normalizarString(busqueda))
   );
 
-  const vistaParadas = paradasFiltradas.map((parada) => (
-    <li key={+parada.code}>
-      <strong>{parada.name}: </strong>
-      {parada.estimations.Albolote.length > 0 && (
-        <>
-          Albolote{" "}
-          {parada.estimations.Albolote.slice(0, 2)
-            .map((estimation) => `${estimation.minutes.toFixed(1)}'`)
-            .join(" - ")}
-        </>
-      )}
-      {parada.estimations.Albolote.length > 0 &&
-        parada.estimations.Armilla.length > 0 &&
-        " ; "}
-      {parada.estimations.Armilla.length > 0 && (
-        <>
-          Armilla{" "}
-          {parada.estimations.Armilla.slice(0, 2)
-            .map((estimation) => `${estimation.minutes.toFixed(1)}'`)
-            .join(" - ")}
-        </>
-      )}
-    </li>
-  ));
-
   return (
     <div className={classes.home}>
       <Input placeholder="Busca una parada" onChange={handleChangeBusqueda} />
-      <ul>{vistaParadas}</ul>
+      <TableContainer>
+        <Table variant="striped">
+          <Thead>
+            <Tr>
+              <Th>Nombre de parada</Th>
+              <Th>Armilla</Th>
+              <Th>Albolote</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {paradasFiltradas.map((parada) => (
+              <Tr key={parada.code}>
+                <Td>{parada.name}</Td>
+                <Td>
+                  <Estimations
+                    estimations={parada.estimations.Armilla}
+                    defaultDestination="Armilla"
+                  />
+                </Td>
+                <Td>
+                  <Estimations
+                    estimations={parada.estimations.Albolote}
+                    defaultDestination="Albolote"
+                  />
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };
