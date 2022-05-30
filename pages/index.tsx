@@ -82,7 +82,9 @@ const Home: NextPage = () => {
             .join(" - ")}
         </>
       )}
-      {" ; "}
+      {parada.albolote.estimations.length > 0 &&
+        parada.armilla.estimations.length > 0 &&
+        " ; "}
       {parada.armilla.estimations.length > 0 && (
         <>
           Armilla{" "}
