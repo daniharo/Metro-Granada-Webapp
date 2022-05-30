@@ -34,6 +34,7 @@ interface Stop {
     Armilla: Estimation[];
     Albolote: Estimation[];
   };
+  favourite: boolean;
 }
 
 interface IEstimationsProps {
@@ -64,9 +65,10 @@ const normalizarString = (string: String) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
-const processInfoParadas: (infoParadas: ParadasAnswer) => Stop[] = (
-  infoParadas: ParadasAnswer
-) => {
+const processInfoParadas: (
+  infoParadas: ParadasAnswer,
+  favouriteStops: Set<number>
+) => Stop[] = (infoParadas, favouriteStops) => {
   const stops: Map<number, Stop> = new Map();
   for (const parada of infoParadas.DestinoArmilla) {
     if (parada.stationPoint === undefined) {
@@ -85,6 +87,7 @@ const processInfoParadas: (infoParadas: ParadasAnswer) => Stop[] = (
           })),
         Albolote: [],
       },
+      favourite: favouriteStops.has(code),
     });
   }
   for (const parada of infoParadas.DestinoAlbolote) {
@@ -105,21 +108,20 @@ const processInfoParadas: (infoParadas: ParadasAnswer) => Stop[] = (
   return Array.from(stops.values());
 };
 
+const DEFAULT_FAVOURITES = new Set<number>();
+
 const Home: NextPage = () => {
   const [infoParadas, setInfoParadas] = useState<ParadasAnswer | null>(null);
   const [busqueda, setBusqueda] = useState("");
-  const [favouriteStops, setFavouriteStops] = useState<Set<number>>(new Set());
-  useEffect(() => {
-    const localStorageFavouriteStops =
-      window.localStorage.getItem("favouriteStops");
-    if (!localStorageFavouriteStops) {
-      return;
+  const [favouriteStops, setFavouriteStops] = useState<Set<number>>(() => {
+    if (typeof window === "undefined") return DEFAULT_FAVOURITES;
+    const localStorageItem = window.localStorage.getItem("favouriteStops");
+    if (localStorageItem) {
+      return new Set(JSON.parse(localStorageItem));
     }
-    const parsed = JSON.parse(localStorageFavouriteStops);
-    if (Array.isArray(parsed)) {
-      setFavouriteStops(new Set(JSON.parse(localStorageFavouriteStops)));
-    }
-  }, []);
+    return DEFAULT_FAVOURITES;
+  });
+
   useEffect(() => {
     window.localStorage.setItem(
       "favouriteStops",
@@ -128,7 +130,15 @@ const Home: NextPage = () => {
   }, [favouriteStops]);
 
   const handleFavStop = (stopCode: number) => {
-    setFavouriteStops((prev) => prev.add(stopCode));
+    setFavouriteStops((prev) => {
+      const copy = new Set(prev);
+      if (prev.has(stopCode)) {
+        copy.delete(stopCode);
+      } else {
+        copy.add(stopCode);
+      }
+      return copy;
+    });
   };
 
   const handleChangeBusqueda: ChangeEventHandler<HTMLInputElement> = (event) =>
@@ -152,10 +162,14 @@ const Home: NextPage = () => {
     );
   }
 
-  const paradasProcesadas = processInfoParadas(infoParadas);
+  const paradasProcesadas = processInfoParadas(infoParadas, favouriteStops);
 
   const paradasFiltradas = paradasProcesadas.filter((parada) =>
     normalizarString(parada.name).includes(normalizarString(busqueda))
+  );
+
+  const paradasOrdenadas = paradasFiltradas.sort((a, b) =>
+    a.favourite ? -1 : a.code === b.code ? 0 : a.code < b.code ? -1 : 1
   );
 
   return (
@@ -171,7 +185,7 @@ const Home: NextPage = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {paradasFiltradas.map((parada) => (
+            {paradasOrdenadas.map((parada) => (
               <Tr key={parada.code}>
                 <Td>
                   <IconButton
