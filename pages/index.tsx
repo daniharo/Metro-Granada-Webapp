@@ -1,8 +1,24 @@
 import type { NextPage } from "next";
 import { ChangeEventHandler, useCallback, useEffect, useState } from "react";
-import { ParadasAnswer, Destino } from "../src/types";
+import { ParadasAnswer } from "../src/types";
 import { Center, Input, Spinner } from "@chakra-ui/react";
 import classes from "../styles/Home.module.css";
+
+interface Estimation {
+  minutes: number;
+  destination: String;
+}
+
+interface Stop {
+  name: String;
+  code: number;
+  estimations: {
+    Armilla: Estimation[];
+    Albolote: Estimation[];
+  };
+}
+
+const getUniqueStationCode = (code: String) => +code.substring(0, 3);
 
 const normalizarString = (string: String) =>
   string
@@ -10,29 +26,45 @@ const normalizarString = (string: String) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
-const processInfoParadas = (infoParadas: ParadasAnswer) => {
-  const paradas: {
-    albolote: Destino<"Albolote">;
-    armilla: Destino<"Armilla">;
-  }[] = [];
+const processInfoParadas: (infoParadas: ParadasAnswer) => Stop[] = (
+  infoParadas: ParadasAnswer
+) => {
+  const stops: Map<number, Stop> = new Map();
   for (const parada of infoParadas.DestinoArmilla) {
-    const codeParada = +parada.stationPoint.code.substring(0, 3);
-    paradas[codeParada] = {
-      armilla: parada,
-      albolote: {
-        code: "",
-        stationPoint: { code: "", name: "" },
-        estimations: [],
+    if (parada.stationPoint === undefined) {
+      continue;
+    }
+    const code = getUniqueStationCode(parada.stationPoint.code);
+    stops.set(code, {
+      name: parada.stationPoint.name.replace(" vía 1", ""),
+      code: +parada.stationPoint.code.substring(0, 3),
+      estimations: {
+        Armilla: parada.estimations
+          .filter((estimation) => estimation.minutes !== undefined)
+          .map((estimation) => ({
+            minutes: +estimation.minutes,
+            destination: estimation.destination,
+          })),
+        Albolote: [],
       },
-    };
+    });
   }
-
   for (const parada of infoParadas.DestinoAlbolote) {
-    const codeParada = +parada.stationPoint.code.substring(0, 3);
-    paradas[codeParada] = { ...paradas[codeParada], albolote: parada };
+    if (parada.stationPoint === undefined) {
+      continue;
+    }
+    const code = getUniqueStationCode(parada.stationPoint.code);
+    const stop = stops.get(code);
+    if (stop) {
+      stop.estimations.Albolote = parada.estimations
+        .filter((estimation) => estimation.minutes !== undefined)
+        .map((estimation) => ({
+          minutes: +estimation.minutes,
+          destination: estimation.destination,
+        }));
+    }
   }
-
-  return paradas;
+  return Array.from(stops.values());
 };
 
 const Home: NextPage = () => {
@@ -63,34 +95,28 @@ const Home: NextPage = () => {
   const paradasProcesadas = processInfoParadas(infoParadas);
 
   const paradasFiltradas = paradasProcesadas.filter((parada) =>
-    normalizarString(parada.armilla.stationPoint.name).includes(
-      normalizarString(busqueda)
-    )
+    normalizarString(parada.name).includes(normalizarString(busqueda))
   );
 
   const vistaParadas = paradasFiltradas.map((parada) => (
-    <li key={+parada.albolote.stationPoint.code}>
-      <strong>
-        {parada.albolote.stationPoint.name.replace(" vía 2", "")}:{" "}
-      </strong>
-      {parada.albolote.estimations.length > 0 && (
+    <li key={+parada.code}>
+      <strong>{parada.name}: </strong>
+      {parada.estimations.Albolote.length > 0 && (
         <>
           Albolote{" "}
-          {parada.albolote.estimations
-            .slice(0, 2)
-            .map((estimation) => `${(+estimation.minutes).toFixed(1)}'`)
+          {parada.estimations.Albolote.slice(0, 2)
+            .map((estimation) => `${estimation.minutes.toFixed(1)}'`)
             .join(" - ")}
         </>
       )}
-      {parada.albolote.estimations.length > 0 &&
-        parada.armilla.estimations.length > 0 &&
+      {parada.estimations.Albolote.length > 0 &&
+        parada.estimations.Armilla.length > 0 &&
         " ; "}
-      {parada.armilla.estimations.length > 0 && (
+      {parada.estimations.Armilla.length > 0 && (
         <>
           Armilla{" "}
-          {parada.armilla.estimations
-            .slice(0, 2)
-            .map((estimation) => `${(+estimation.minutes).toFixed(1)}'`)
+          {parada.estimations.Armilla.slice(0, 2)
+            .map((estimation) => `${estimation.minutes.toFixed(1)}'`)
             .join(" - ")}
         </>
       )}
