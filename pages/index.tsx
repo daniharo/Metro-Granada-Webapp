@@ -8,6 +8,7 @@ import React, {
 import { ParadasAnswer } from "../src/types";
 import {
   Center,
+  IconButton,
   Input,
   Spinner,
   Table,
@@ -19,6 +20,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import classes from "../styles/Home.module.css";
+import { StarIcon } from "@chakra-ui/icons";
 
 interface Estimation {
   minutes: number;
@@ -106,12 +108,34 @@ const processInfoParadas: (infoParadas: ParadasAnswer) => Stop[] = (
 const Home: NextPage = () => {
   const [infoParadas, setInfoParadas] = useState<ParadasAnswer | null>(null);
   const [busqueda, setBusqueda] = useState("");
+  const [favouriteStops, setFavouriteStops] = useState<Set<number>>(new Set());
+  useEffect(() => {
+    const localStorageFavouriteStops =
+      window.localStorage.getItem("favouriteStops");
+    if (!localStorageFavouriteStops) {
+      return;
+    }
+    const parsed = JSON.parse(localStorageFavouriteStops);
+    if (Array.isArray(parsed)) {
+      setFavouriteStops(new Set(JSON.parse(localStorageFavouriteStops)));
+    }
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem(
+      "favouriteStops",
+      JSON.stringify(Array.from(favouriteStops))
+    );
+  }, [favouriteStops]);
+
+  const handleFavStop = (stopCode: number) => {
+    setFavouriteStops((prev) => prev.add(stopCode));
+  };
 
   const handleChangeBusqueda: ChangeEventHandler<HTMLInputElement> = (event) =>
     setBusqueda(event.target.value);
 
   const fetchData = useCallback(async () => {
-    const respuesta = await fetch("/api/paradas");
+    const respuesta = await fetch("/MG_paradas.json");
     setInfoParadas(await respuesta.json());
   }, []);
 
@@ -138,7 +162,7 @@ const Home: NextPage = () => {
     <div className={classes.home}>
       <Input placeholder="Busca una parada" onChange={handleChangeBusqueda} />
       <TableContainer>
-        <Table variant="striped">
+        <Table variant="simple">
           <Thead>
             <Tr>
               <Th>Nombre de parada</Th>
@@ -149,7 +173,19 @@ const Home: NextPage = () => {
           <Tbody>
             {paradasFiltradas.map((parada) => (
               <Tr key={parada.code}>
-                <Td>{parada.name}</Td>
+                <Td>
+                  <IconButton
+                    className={classes.favouriteButton}
+                    icon={<StarIcon />}
+                    size={"xs"}
+                    aria-label="Marcar como favorito"
+                    onClick={() => handleFavStop(parada.code)}
+                    color={
+                      favouriteStops.has(parada.code) ? "yellow" : undefined
+                    }
+                  />
+                  {parada.name}
+                </Td>
                 <Td>
                   <Estimations
                     estimations={parada.estimations.Armilla}
