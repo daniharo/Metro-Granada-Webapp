@@ -7,3 +7,7 @@
 .favouriteButton {
     margin-right: 8px;
 }
+
+.bold {
+    font-family: Encode-Sans-Bold, sans-serif;
+}

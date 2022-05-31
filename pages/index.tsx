@@ -210,7 +210,11 @@ const Home: NextPage = () => {
                       favouriteStops.has(parada.code) ? "yellow.400" : undefined
                     }
                   />
-                  {parada.name}
+                  {favouriteStops.has(parada.code) ? (
+                    <span className={classes.bold}>{parada.name}</span>
+                  ) : (
+                    parada.name
+                  )}
                 </Td>
                 <Td>
                   <Estimations
