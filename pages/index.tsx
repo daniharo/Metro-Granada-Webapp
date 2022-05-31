@@ -153,7 +153,7 @@ const Home: NextPage = () => {
     setBusqueda(event.target.value);
 
   const fetchData = useCallback(async () => {
-    const respuesta = await fetch("/MG_paradas.json");
+    const respuesta = await fetch("/api/paradas");
     setInfoParadas(await respuesta.json());
   }, []);
 
