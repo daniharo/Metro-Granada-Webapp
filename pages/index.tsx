@@ -9,6 +9,7 @@ import { ParadasAnswer } from "../src/types";
 import {
   Box,
   Center,
+  chakra,
   CloseButton,
   Drawer,
   DrawerBody,
@@ -16,10 +17,17 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
+  FormLabel,
   IconButton,
   Input,
   InputGroup,
   InputRightElement,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
   Spinner,
   Table,
   TableContainer,
@@ -34,6 +42,7 @@ import classes from "../styles/Home.module.css";
 import { StarIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { UseCounterProps } from "@chakra-ui/react";
 
 interface Estimation {
   minutes: number;
@@ -53,10 +62,12 @@ interface Stop {
 interface IEstimationsProps {
   estimations: Estimation[];
   defaultDestination: String;
+  decimals: number;
 }
 const Estimations: React.FC<IEstimationsProps> = ({
   estimations,
   defaultDestination,
+  decimals,
 }) => (
   <span>
     {estimations
@@ -64,7 +75,7 @@ const Estimations: React.FC<IEstimationsProps> = ({
       .map((estimation) => {
         const complement =
           estimation.destination === defaultDestination ? "" : "*";
-        return `${estimation.minutes.toFixed(1)}${complement}'`;
+        return `${estimation.minutes.toFixed(decimals)}${complement}'`;
       })
       .join(" - ")}
   </span>
@@ -127,6 +138,7 @@ const Home: NextPage = () => {
   const router = useRouter();
   const [infoParadas, setInfoParadas] = useState<ParadasAnswer | null>(null);
   const [busqueda, setBusqueda] = useState("");
+  const [decimals, setDecimals] = useState(0);
   const {
     isOpen: drawerIsOpen,
     onOpen: onOpenDrawer,
@@ -168,6 +180,9 @@ const Home: NextPage = () => {
 
   const handleChangeBusqueda: ChangeEventHandler<HTMLInputElement> = (event) =>
     setBusqueda(event.target.value);
+
+  const handleChangeDecimales: UseCounterProps["onChange"] = (_, value) =>
+    setDecimals(value);
 
   const fetchData = useCallback(async () => {
     const respuesta = await fetch("/api/paradas");
@@ -258,12 +273,14 @@ const Home: NextPage = () => {
                   <Estimations
                     estimations={parada.estimations.Armilla}
                     defaultDestination="Armilla"
+                    decimals={decimals}
                   />
                 </Td>
                 <Td>
                   <Estimations
                     estimations={parada.estimations.Albolote}
                     defaultDestination="Albolote"
+                    decimals={decimals}
                   />
                 </Td>
               </Tr>
@@ -278,10 +295,26 @@ const Home: NextPage = () => {
           <DrawerHeader></DrawerHeader>
 
           <DrawerBody>
-            Hora de los últimos datos:
-            <br />
-            {infoParadas.cargaInicio}
-            <br />
+            <Flex flexDirection="column">
+              <strong>Hora de los últimos datos:</strong>
+              <chakra.span mb={4}>{infoParadas.cargaInicio}</chakra.span>
+              <FormLabel htmlFor="decimales">
+                <strong>Decimales</strong>
+              </FormLabel>
+              <NumberInput
+                id="decimales"
+                value={decimals}
+                onChange={handleChangeDecimales}
+                min={0}
+                max={3}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </Flex>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
