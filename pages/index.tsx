@@ -207,7 +207,7 @@ const Home: NextPage = () => {
                     aria-label="Marcar como favorito"
                     onClick={() => handleFavStop(parada.code)}
                     color={
-                      favouriteStops.has(parada.code) ? "yellow" : undefined
+                      favouriteStops.has(parada.code) ? "yellow.400" : undefined
                     }
                   />
                   {parada.name}

@@ -11,13 +11,21 @@ const colors = {
   },
 };
 
+const components = {
+  Input: {
+    defaultProps: {
+      focusBorderColor: "brand.700",
+    },
+  },
+};
+
 const fonts = {
   body: "Encode-Sans, sans-serif",
   heading: "Encode-Sans-Bold, serif",
   mono: "Menlo, monospace",
 };
 
-const theme = extendTheme({ colors, fonts });
+const theme = extendTheme({ colors, fonts, components });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
