@@ -22,6 +22,7 @@ import {
 import classes from "../styles/Home.module.css";
 import { StarIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 interface Estimation {
   minutes: number;
@@ -182,6 +183,9 @@ const Home: NextPage = () => {
 
   return (
     <div className={classes.home}>
+      <Head>
+        <title>Metropolitano de Granada - Tiempos de paso (NO OFICIAL)</title>
+      </Head>
       <Input
         placeholder="Busca una parada"
         onChange={handleChangeBusqueda}
