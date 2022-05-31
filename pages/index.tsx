@@ -21,6 +21,7 @@ import {
 } from "@chakra-ui/react";
 import classes from "../styles/Home.module.css";
 import { StarIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
 
 interface Estimation {
   minutes: number;
@@ -111,6 +112,7 @@ const processInfoParadas: (
 const DEFAULT_FAVOURITES = new Set<number>();
 
 const Home: NextPage = () => {
+  const router = useRouter();
   const [infoParadas, setInfoParadas] = useState<ParadasAnswer | null>(null);
   const [busqueda, setBusqueda] = useState("");
   const [favouriteStops, setFavouriteStops] = useState<Set<number>>(() => {
@@ -121,6 +123,12 @@ const Home: NextPage = () => {
     }
     return DEFAULT_FAVOURITES;
   });
+
+  useEffect(() => {
+    if (router.query.search) {
+      setBusqueda(router.query.search as string);
+    }
+  }, [router.query.search]);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -174,7 +182,11 @@ const Home: NextPage = () => {
 
   return (
     <div className={classes.home}>
-      <Input placeholder="Busca una parada" onChange={handleChangeBusqueda} />
+      <Input
+        placeholder="Busca una parada"
+        onChange={handleChangeBusqueda}
+        value={busqueda}
+      />
       <TableContainer>
         <Table variant="simple">
           <Thead>
