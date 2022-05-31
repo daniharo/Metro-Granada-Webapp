@@ -7,8 +7,15 @@ import React, {
 } from "react";
 import { ParadasAnswer } from "../src/types";
 import {
+  Box,
   Center,
   CloseButton,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
   IconButton,
   Input,
   InputGroup,
@@ -21,9 +28,10 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import classes from "../styles/Home.module.css";
-import { StarIcon } from "@chakra-ui/icons";
+import { StarIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
@@ -119,6 +127,11 @@ const Home: NextPage = () => {
   const router = useRouter();
   const [infoParadas, setInfoParadas] = useState<ParadasAnswer | null>(null);
   const [busqueda, setBusqueda] = useState("");
+  const {
+    isOpen: drawerIsOpen,
+    onOpen: onOpenDrawer,
+    onClose: onCloseDrawer,
+  } = useDisclosure();
   const [favouriteStops, setFavouriteStops] = useState<Set<number>>(() => {
     if (typeof window === "undefined") return DEFAULT_FAVOURITES;
     const localStorageItem = window.localStorage.getItem("favouriteStops");
@@ -191,19 +204,27 @@ const Home: NextPage = () => {
       <Head>
         <title>Metropolitano de Granada - Tiempos de paso (NO OFICIAL)</title>
       </Head>
-      <InputGroup>
-        <Input
-          placeholder="Busca una parada"
-          onChange={handleChangeBusqueda}
-          value={busqueda}
-        />
-        <InputRightElement>
-          <CloseButton
-            aria-label="Borrar búsqueda"
-            onClick={() => setBusqueda("")}
+      <Box display="flex">
+        <InputGroup mr={2}>
+          <Input
+            autoFocus={busqueda.length > 0}
+            placeholder="Busca una parada"
+            onChange={handleChangeBusqueda}
+            value={busqueda}
           />
-        </InputRightElement>
-      </InputGroup>
+          <InputRightElement>
+            <CloseButton
+              aria-label="Borrar búsqueda"
+              onClick={() => setBusqueda("")}
+            />
+          </InputRightElement>
+        </InputGroup>
+        <IconButton
+          aria-label="Abrir menú"
+          icon={<HamburgerIcon />}
+          onClick={onOpenDrawer}
+        />
+      </Box>
       <TableContainer>
         <Table variant="simple">
           <Thead>
@@ -250,6 +271,20 @@ const Home: NextPage = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      <Drawer isOpen={drawerIsOpen} onClose={onCloseDrawer}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader></DrawerHeader>
+
+          <DrawerBody>
+            Hora de los últimos datos:
+            <br />
+            {infoParadas.cargaInicio}
+            <br />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };
