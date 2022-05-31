@@ -177,9 +177,11 @@ const Home: NextPage = () => {
     normalizarString(parada.name).includes(normalizarString(busqueda))
   );
 
-  const paradasOrdenadas = paradasFiltradas.sort((a, b) =>
-    a.favourite ? -1 : a.code === b.code ? 0 : a.code < b.code ? -1 : 1
-  );
+  const paradasOrdenadas = paradasFiltradas.sort((a, b) => {
+    if (a.favourite && !b.favourite) return -1;
+    if (!a.favourite && b.favourite) return 1;
+    return a.code < b.code ? -1 : a.code === b.code ? 0 : 1;
+  });
 
   return (
     <div className={classes.home}>
