@@ -8,8 +8,11 @@ import React, {
 import { ParadasAnswer } from "../src/types";
 import {
   Center,
+  CloseButton,
   IconButton,
   Input,
+  InputGroup,
+  InputRightElement,
   Spinner,
   Table,
   TableContainer,
@@ -188,11 +191,19 @@ const Home: NextPage = () => {
       <Head>
         <title>Metropolitano de Granada - Tiempos de paso (NO OFICIAL)</title>
       </Head>
-      <Input
-        placeholder="Busca una parada"
-        onChange={handleChangeBusqueda}
-        value={busqueda}
-      />
+      <InputGroup>
+        <Input
+          placeholder="Busca una parada"
+          onChange={handleChangeBusqueda}
+          value={busqueda}
+        />
+        <InputRightElement>
+          <CloseButton
+            aria-label="Borrar búsqueda"
+            onClick={() => setBusqueda("")}
+          />
+        </InputRightElement>
+      </InputGroup>
       <TableContainer>
         <Table variant="simple">
           <Thead>
