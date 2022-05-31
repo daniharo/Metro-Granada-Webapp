@@ -28,6 +28,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  ScaleFade,
   Spinner,
   Table,
   TableContainer,
@@ -227,12 +228,14 @@ const Home: NextPage = () => {
             onChange={handleChangeBusqueda}
             value={busqueda}
           />
-          <InputRightElement>
-            <CloseButton
-              aria-label="Borrar búsqueda"
-              onClick={() => setBusqueda("")}
-            />
-          </InputRightElement>
+          <ScaleFade initialScale={0.9} in={busqueda.length > 0}>
+            <InputRightElement>
+              <CloseButton
+                aria-label="Borrar búsqueda"
+                onClick={() => setBusqueda("")}
+              />
+            </InputRightElement>
+          </ScaleFade>
         </InputGroup>
         <IconButton
           aria-label="Abrir menú"
