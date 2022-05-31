@@ -165,8 +165,8 @@ const Home: NextPage = () => {
 
   if (infoParadas === null) {
     return (
-      <Center>
-        <Spinner />
+      <Center height="100vh">
+        <Spinner size="xl" />
       </Center>
     );
   }
