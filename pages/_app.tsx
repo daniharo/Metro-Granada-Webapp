@@ -19,13 +19,17 @@ const components = {
   },
 };
 
+const shadows = {
+  outline: "none",
+};
+
 const fonts = {
   body: "Encode-Sans, sans-serif",
   heading: "Encode-Sans-Bold, serif",
   mono: "Menlo, monospace",
 };
 
-const theme = extendTheme({ colors, fonts, components });
+const theme = extendTheme({ colors, fonts, components, shadows });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
