@@ -5,8 +5,7 @@ import {
 } from "./constants";
 import { Coordinate } from "./types";
 import { EnrichedGeolocationCoordinates } from "./hooks/useGeolocation";
-import parse from "date-fns/parse";
-import differenceInMinutes from "date-fns/differenceInMinutes";
+import { parse, differenceInMinutes } from "date-fns";
 
 function getDistanceFromLatLonInKm(
   positionA: Coordinate,
