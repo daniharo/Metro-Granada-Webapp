@@ -144,6 +144,7 @@ interface IStopRowProps {
   estimationsArmilla: Estimation[];
   estimationsAlbolote: Estimation[];
   decimals: number;
+  type?: "normal" | "nearest";
 }
 const StopRow: React.FC<IStopRowProps> = ({
   favourite,
@@ -152,8 +153,9 @@ const StopRow: React.FC<IStopRowProps> = ({
   decimals,
   estimationsAlbolote,
   estimationsArmilla,
+  type = "normal",
 }) => (
-  <Tr>
+  <Tr bgColor={type === "nearest" ? "blue.50" : "none"}>
     <Td>
       <IconButton
         className={classes.favouriteButton}
@@ -320,6 +322,7 @@ const Home: NextPage = () => {
                   estimationsArmilla={nearestStop.estimations.Armilla}
                   estimationsAlbolote={nearestStop.estimations.Albolote}
                   decimals={decimals}
+                  type="nearest"
                 />
               </>
             )}
