@@ -95,7 +95,7 @@ const normalizarString = (string: String) =>
 const processInfoParadas: (
   infoParadas: ParadasAnswer,
   favouriteStops: Set<number>
-) => Stop[] = (infoParadas, favouriteStops) => {
+) => Map<number, Stop> = (infoParadas, favouriteStops) => {
   const stops: Map<number, Stop> = new Map();
   for (const parada of infoParadas.DestinoArmilla) {
     if (parada.stationPoint === undefined) {
@@ -132,7 +132,7 @@ const processInfoParadas: (
         }));
     }
   }
-  return Array.from(stops.values());
+  return stops;
 };
 
 const DEFAULT_FAVOURITES = new Set<number>();
@@ -144,7 +144,7 @@ interface IStopRowProps {
   estimationsArmilla: Estimation[];
   estimationsAlbolote: Estimation[];
   decimals: number;
-  type?: "normal" | "nearest";
+  section?: "normal" | "nearest" | "favourites";
 }
 const StopRow: React.FC<IStopRowProps> = ({
   favourite,
@@ -153,9 +153,9 @@ const StopRow: React.FC<IStopRowProps> = ({
   decimals,
   estimationsAlbolote,
   estimationsArmilla,
-  type = "normal",
+  section = "normal",
 }) => (
-  <Tr bgColor={type === "nearest" ? "blue.50" : "none"}>
+  <Tr bgColor={section === "nearest" ? "blue.50" : "none"}>
     <Td>
       <IconButton
         className={classes.favouriteButton}
@@ -165,7 +165,7 @@ const StopRow: React.FC<IStopRowProps> = ({
         onClick={onToggleFavourite}
         color={favourite ? "yellow.400" : undefined}
       />
-      {favourite || type === "nearest" ? (
+      {(favourite && section === "favourites") || section === "nearest" ? (
         <span className={classes.bold}>{name}</span>
       ) : (
         name
@@ -260,18 +260,17 @@ const Home: NextPage = () => {
 
   const paradasProcesadas = processInfoParadas(infoParadas, favouriteStops);
 
-  const paradasFiltradas = paradasProcesadas.filter((parada) =>
-    normalizarString(parada.name).includes(normalizarString(busqueda))
+  const paradasFiltradas = Array.from(paradasProcesadas.values()).filter(
+    (parada) =>
+      normalizarString(parada.name).includes(normalizarString(busqueda))
+  );
+
+  const favouriteStopsObjects = Array.from(favouriteStops).map((code) =>
+    paradasProcesadas.get(code)
   );
 
   const nearestStop =
-    nearestStopCode !== null ? paradasProcesadas[nearestStopCode] : null;
-
-  const paradasOrdenadas = paradasFiltradas.sort((a, b) => {
-    if (a.favourite && !b.favourite) return -1;
-    if (!a.favourite && b.favourite) return 1;
-    return a.code < b.code ? -1 : a.code === b.code ? 0 : 1;
-  });
+    nearestStopCode !== null ? paradasProcesadas.get(nearestStopCode) : null;
 
   return (
     <div className={classes.home}>
@@ -326,18 +325,41 @@ const Home: NextPage = () => {
                   estimationsArmilla={nearestStop.estimations.Armilla}
                   estimationsAlbolote={nearestStop.estimations.Albolote}
                   decimals={decimals}
-                  type="nearest"
+                  section="nearest"
                 />
+              </>
+            )}
+            {busqueda.length === 0 && favouriteStopsObjects.length > 0 && (
+              <>
+                <Thead>
+                  <Tr>
+                    <Th>Favoritas</Th>
+                  </Tr>
+                </Thead>
+                {favouriteStopsObjects.map((parada) =>
+                  parada ? (
+                    <StopRow
+                      key={parada.code}
+                      favourite={favouriteStops.has(parada.code)}
+                      onToggleFavourite={() => handleFavStop(parada.code)}
+                      name={parada.name}
+                      estimationsArmilla={parada.estimations.Armilla}
+                      estimationsAlbolote={parada.estimations.Albolote}
+                      decimals={decimals}
+                      section="favourites"
+                    />
+                  ) : null
+                )}
               </>
             )}
             {nearestStop && (
               <Thead>
                 <Tr>
-                  <Th>Todas</Th>
+                  <Th>{busqueda.length === 0 ? "Todas" : "Búsqueda"}</Th>
                 </Tr>
               </Thead>
             )}
-            {paradasOrdenadas.map((parada) => (
+            {paradasFiltradas.map((parada) => (
               <StopRow
                 key={parada.code}
                 favourite={favouriteStops.has(parada.code)}
