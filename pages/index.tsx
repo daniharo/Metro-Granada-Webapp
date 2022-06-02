@@ -9,25 +9,11 @@ import { ParadasAnswer } from "../src/types";
 import {
   Box,
   Center,
-  chakra,
   CloseButton,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormLabel,
   IconButton,
   Input,
   InputGroup,
   InputRightElement,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
   ScaleFade,
   Spinner,
   Table,
@@ -46,6 +32,7 @@ import Head from "next/head";
 import { UseCounterProps } from "@chakra-ui/react";
 import useGeolocation from "../src/hooks/useGeolocation.js";
 import { getNearestStopForLocation } from "../src/utils";
+import RightDrawer from "../components/Drawer";
 
 interface Estimation {
   minutes: number;
@@ -373,36 +360,13 @@ const Home: NextPage = () => {
           </Tbody>
         </Table>
       </TableContainer>
-      <Drawer isOpen={drawerIsOpen} onClose={onCloseDrawer}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader></DrawerHeader>
-
-          <DrawerBody>
-            <Flex flexDirection="column">
-              <strong>Hora de los últimos datos:</strong>
-              <chakra.span mb={4}>{infoParadas.cargaInicio}</chakra.span>
-              <FormLabel htmlFor="decimales">
-                <strong>Decimales</strong>
-              </FormLabel>
-              <NumberInput
-                id="decimales"
-                value={decimals}
-                onChange={handleChangeDecimales}
-                min={0}
-                max={3}
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </Flex>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+      <RightDrawer
+        isOpen={drawerIsOpen}
+        onClose={onCloseDrawer}
+        lastDataTime={infoParadas.cargaInicio}
+        onChangeDecimals={handleChangeDecimales}
+        decimals={decimals}
+      />
     </div>
   );
 };

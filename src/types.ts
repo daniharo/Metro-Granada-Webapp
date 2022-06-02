@@ -1,23 +1,23 @@
 export interface ParadasAnswer {
-  cargaInicio: String;
-  CargaFin: String;
+  cargaInicio: string;
+  CargaFin: string;
   DestinoArmilla: Destino<"Armilla">[];
   DestinoAlbolote: Destino<"Albolote">[];
 }
 
 export interface Destino<D extends "Armilla" | "Albolote"> {
-  code: String;
+  code: string;
   estimations: {
-    compCode: String;
-    compDistance: String;
+    compCode: string;
+    compDistance: string;
     destination: D;
-    lineCode: String;
-    minutes: String;
+    lineCode: string;
+    minutes: string;
     scheduled: boolean;
   }[];
   stationPoint: {
-    code: String;
-    name: String;
+    code: string;
+    name: string;
   };
 }
 
