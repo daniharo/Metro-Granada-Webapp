@@ -6,6 +6,10 @@ export const SERVER_URLS = {
   PARADAS: "/datos_abiertos/MG_paradas.json",
 };
 
+export const EXTERNAL_URLS = {
+  OFFICIAL_WEBPAGE: "https://metropolitanogranada.es",
+};
+
 export const STOPS_POSITION: { [key: string]: Coordinate } = {
   1: { latitude: 37.228248639053824, longitude: -3.653566164626006 },
   2: { latitude: 37.22258804671614, longitude: -3.6458801266025254 },
