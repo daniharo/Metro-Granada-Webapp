@@ -1,3 +1,5 @@
+// From https://github.com/bence-toth/react-hook-geolocation
+
 import { useEffect, useState } from "react";
 
 const useGeolocation = (

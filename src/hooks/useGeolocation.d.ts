@@ -1,3 +1,5 @@
+// From https://github.com/bence-toth/react-hook-geolocation
+
 export interface EnrichedGeolocationCoordinates extends GeolocationCoordinates {
   timestamp: GeolocationPosition["timestamp"] | null;
   error: GeolocationPositionError | null;
