@@ -20,3 +20,8 @@ export interface Destino<D extends "Armilla" | "Albolote"> {
     name: String;
   };
 }
+
+export interface Coordinate {
+  latitude: number;
+  longitude: number;
+}

@@ -44,14 +44,16 @@ import { StarIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { UseCounterProps } from "@chakra-ui/react";
+import useGeolocation from "../src/hooks/useGeolocation.js";
+import { getNearestStopForLocation } from "../src/utils";
 
 interface Estimation {
   minutes: number;
-  destination: String;
+  destination: string;
 }
 
 interface Stop {
-  name: String;
+  name: string;
   code: number;
   estimations: {
     Armilla: Estimation[];
@@ -62,7 +64,7 @@ interface Stop {
 
 interface IEstimationsProps {
   estimations: Estimation[];
-  defaultDestination: String;
+  defaultDestination: string;
   decimals: number;
 }
 const Estimations: React.FC<IEstimationsProps> = ({
@@ -135,6 +137,51 @@ const processInfoParadas: (
 
 const DEFAULT_FAVOURITES = new Set<number>();
 
+interface IStopRowProps {
+  favourite: boolean;
+  onToggleFavourite: React.MouseEventHandler<HTMLButtonElement>;
+  name: string;
+  estimationsArmilla: Estimation[];
+  estimationsAlbolote: Estimation[];
+  decimals: number;
+}
+const StopRow: React.FC<IStopRowProps> = ({
+  favourite,
+  onToggleFavourite,
+  name,
+  decimals,
+  estimationsAlbolote,
+  estimationsArmilla,
+}) => (
+  <Tr>
+    <Td>
+      <IconButton
+        className={classes.favouriteButton}
+        icon={<StarIcon />}
+        size={"xs"}
+        aria-label="Marcar como favorito"
+        onClick={onToggleFavourite}
+        color={favourite ? "yellow.400" : undefined}
+      />
+      {favourite ? <span className={classes.bold}>{name}</span> : name}
+    </Td>
+    <Td>
+      <Estimations
+        estimations={estimationsArmilla}
+        defaultDestination="Armilla"
+        decimals={decimals}
+      />
+    </Td>
+    <Td>
+      <Estimations
+        estimations={estimationsAlbolote}
+        defaultDestination="Albolote"
+        decimals={decimals}
+      />
+    </Td>
+  </Tr>
+);
+
 const Home: NextPage = () => {
   const router = useRouter();
   const [infoParadas, setInfoParadas] = useState<ParadasAnswer | null>(null);
@@ -153,6 +200,8 @@ const Home: NextPage = () => {
     }
     return DEFAULT_FAVOURITES;
   });
+  const geolocation = useGeolocation({ enableHighAccuracy: true });
+  const nearestStopCode = getNearestStopForLocation(geolocation);
 
   useEffect(() => {
     if (router.query.search) {
@@ -209,6 +258,9 @@ const Home: NextPage = () => {
     normalizarString(parada.name).includes(normalizarString(busqueda))
   );
 
+  const nearestStop =
+    nearestStopCode !== null ? paradasProcesadas[nearestStopCode] : null;
+
   const paradasOrdenadas = paradasFiltradas.sort((a, b) => {
     if (a.favourite && !b.favourite) return -1;
     if (!a.favourite && b.favourite) return 1;
@@ -253,40 +305,41 @@ const Home: NextPage = () => {
             </Tr>
           </Thead>
           <Tbody>
+            {nearestStop && (
+              <>
+                <Thead>
+                  <Tr>
+                    <Th>Más cercana</Th>
+                  </Tr>
+                </Thead>
+                <StopRow
+                  key={nearestStop.code}
+                  favourite={favouriteStops.has(nearestStop.code)}
+                  onToggleFavourite={() => handleFavStop(nearestStop.code)}
+                  name={nearestStop.name}
+                  estimationsArmilla={nearestStop.estimations.Armilla}
+                  estimationsAlbolote={nearestStop.estimations.Albolote}
+                  decimals={decimals}
+                />
+              </>
+            )}
+            {nearestStop && (
+              <Thead>
+                <Tr>
+                  <Th>Todas</Th>
+                </Tr>
+              </Thead>
+            )}
             {paradasOrdenadas.map((parada) => (
-              <Tr key={parada.code}>
-                <Td>
-                  <IconButton
-                    className={classes.favouriteButton}
-                    icon={<StarIcon />}
-                    size={"xs"}
-                    aria-label="Marcar como favorito"
-                    onClick={() => handleFavStop(parada.code)}
-                    color={
-                      favouriteStops.has(parada.code) ? "yellow.400" : undefined
-                    }
-                  />
-                  {favouriteStops.has(parada.code) ? (
-                    <span className={classes.bold}>{parada.name}</span>
-                  ) : (
-                    parada.name
-                  )}
-                </Td>
-                <Td>
-                  <Estimations
-                    estimations={parada.estimations.Armilla}
-                    defaultDestination="Armilla"
-                    decimals={decimals}
-                  />
-                </Td>
-                <Td>
-                  <Estimations
-                    estimations={parada.estimations.Albolote}
-                    defaultDestination="Albolote"
-                    decimals={decimals}
-                  />
-                </Td>
-              </Tr>
+              <StopRow
+                key={parada.code}
+                favourite={favouriteStops.has(parada.code)}
+                onToggleFavourite={() => handleFavStop(parada.code)}
+                name={parada.name}
+                estimationsArmilla={parada.estimations.Armilla}
+                estimationsAlbolote={parada.estimations.Albolote}
+                decimals={decimals}
+              />
             ))}
           </Tbody>
         </Table>
