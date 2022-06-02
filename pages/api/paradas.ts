@@ -9,6 +9,8 @@ export default async function handler(
   const respuesta = await fetch(`${DOMAIN}${SERVER_URLS.PARADAS}`);
   const text = await respuesta.text();
   const trimmedText = text.trim();
-  const json = JSON.parse(trimmedText);
-  res.status(200).json(json);
+  res
+    .status(200)
+    .setHeader("Content-Type", "application/json")
+    .send(trimmedText);
 }
