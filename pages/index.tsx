@@ -35,6 +35,8 @@ import { UseCounterProps } from "@chakra-ui/react";
 import useGeolocation from "../src/hooks/useGeolocation.js";
 import { getNearestStopForLocation, isDataDeprecated } from "../src/utils";
 import RightDrawer from "../components/Drawer";
+import { UPDATE_INTERVAL_MS } from "../src/constants";
+import { clearInterval } from "timers";
 
 interface Estimation {
   minutes: number;
@@ -249,7 +251,8 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     fetchData();
-    setInterval(fetchData, 7000);
+    const interval = setInterval(fetchData, UPDATE_INTERVAL_MS);
+    return () => clearInterval(interval);
   }, [fetchData]);
 
   if (infoParadas === null) {
