@@ -14,6 +14,7 @@ import {
   IconButton,
   Input,
   InputGroup,
+  InputLeftElement,
   InputRightElement,
   ScaleFade,
   Spinner,
@@ -28,7 +29,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import classes from "../styles/Home.module.css";
-import { StarIcon, HamburgerIcon } from "@chakra-ui/icons";
+import { StarIcon, HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { UseCounterProps } from "@chakra-ui/react";
@@ -36,7 +37,6 @@ import useGeolocation from "../src/hooks/useGeolocation.js";
 import { getNearestStopForLocation, isDataDeprecated } from "../src/utils";
 import RightDrawer from "../components/Drawer";
 import { UPDATE_INTERVAL_MS } from "../src/constants";
-import { clearInterval } from "timers";
 
 interface Estimation {
   minutes: number;
@@ -287,6 +287,9 @@ const Home: NextPage = () => {
       </Head>
       <Box display="flex">
         <InputGroup mr={2}>
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.300" />
+          </InputLeftElement>
           <Input
             autoFocus={busqueda.length > 0}
             placeholder="Busca una parada"
