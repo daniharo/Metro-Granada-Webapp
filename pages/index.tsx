@@ -165,7 +165,11 @@ const StopRow: React.FC<IStopRowProps> = ({
         onClick={onToggleFavourite}
         color={favourite ? "yellow.400" : undefined}
       />
-      {favourite ? <span className={classes.bold}>{name}</span> : name}
+      {favourite || type === "nearest" ? (
+        <span className={classes.bold}>{name}</span>
+      ) : (
+        name
+      )}
     </Td>
     <Td>
       <Estimations
