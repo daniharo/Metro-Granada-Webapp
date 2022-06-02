@@ -274,6 +274,9 @@ const Home: NextPage = () => {
   const nearestStop =
     nearestStopCode !== null ? paradasProcesadas.get(nearestStopCode) : null;
 
+  const showFavourites =
+    busqueda.length === 0 && favouriteStopsObjects.length > 0;
+
   return (
     <div className={classes.home}>
       <Head>
@@ -311,14 +314,14 @@ const Home: NextPage = () => {
               <Th>Albolote</Th>
             </Tr>
           </Thead>
-          <Tbody>
-            {nearestStop && (
-              <>
-                <Thead>
-                  <Tr>
-                    <Th>Más cercana</Th>
-                  </Tr>
-                </Thead>
+          {nearestStop && (
+            <>
+              <Thead>
+                <Tr>
+                  <Th>Más cercana</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
                 <StopRow
                   key={nearestStop.code}
                   favourite={favouriteStops.has(nearestStop.code)}
@@ -329,15 +332,17 @@ const Home: NextPage = () => {
                   decimals={decimals}
                   section="nearest"
                 />
-              </>
-            )}
-            {busqueda.length === 0 && favouriteStopsObjects.length > 0 && (
-              <>
-                <Thead>
-                  <Tr>
-                    <Th>Favoritas</Th>
-                  </Tr>
-                </Thead>
+              </Tbody>
+            </>
+          )}
+          {showFavourites && (
+            <>
+              <Thead>
+                <Tr>
+                  <Th>Favoritas</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
                 {favouriteStopsObjects.map((parada) =>
                   parada ? (
                     <StopRow
@@ -352,15 +357,17 @@ const Home: NextPage = () => {
                     />
                   ) : null
                 )}
-              </>
-            )}
-            {nearestStop && (
-              <Thead>
-                <Tr>
-                  <Th>{busqueda.length === 0 ? "Todas" : "Búsqueda"}</Th>
-                </Tr>
-              </Thead>
-            )}
+              </Tbody>
+            </>
+          )}
+          {(showFavourites || nearestStop) && (
+            <Thead>
+              <Tr>
+                <Th>{busqueda.length === 0 ? "Todas" : "Búsqueda"}</Th>
+              </Tr>
+            </Thead>
+          )}
+          <Tbody>
             {paradasFiltradas.map((parada) => (
               <StopRow
                 key={parada.code}
