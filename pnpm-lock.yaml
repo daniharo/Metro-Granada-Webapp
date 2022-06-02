@@ -10,6 +10,7 @@ specifiers:
   '@types/node': 17.0.36
   '@types/react': 18.0.9
   '@types/react-dom': 18.0.5
+  date-fns: ^2.28.0
   eslint: 8.16.0
   eslint-config-next: 12.1.6
   framer-motion: ^6
@@ -26,6 +27,7 @@ dependencies:
   '@chakra-ui/system': 2.1.1_t4r7icl7x3elshpaxc4xm7jrem
   '@emotion/react': 11.9.0_wyic7k6y4scqvmgrpshixuqwly
   '@emotion/styled': 11.8.1_v7eedgdx7xjx7aqq5pyjhqmfyu
+  date-fns: 2.28.0
   framer-motion: 6.3.5_ef5jwxihqo6n7gxfmzogljlgcm
   next: 12.1.6_6j5eyi3us3liopewjenwniphpy
   react: 18.1.0
@@ -1732,6 +1734,11 @@ packages:
   /damerau-levenshtein/1.0.8:
     resolution: {integrity: sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==}
     dev: true
+
+  /date-fns/2.28.0:
+    resolution: {integrity: sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw==}
+    engines: {node: '>=0.11'}
+    dev: false
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}

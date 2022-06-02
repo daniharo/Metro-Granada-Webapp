@@ -3,6 +3,7 @@ import React, {
   ChangeEventHandler,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { ParadasAnswer } from "../src/types";
@@ -24,6 +25,7 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import classes from "../styles/Home.module.css";
 import { StarIcon, HamburgerIcon } from "@chakra-ui/icons";
@@ -31,7 +33,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { UseCounterProps } from "@chakra-ui/react";
 import useGeolocation from "../src/hooks/useGeolocation.js";
-import { getNearestStopForLocation } from "../src/utils";
+import { getNearestStopForLocation, isDataDeprecated } from "../src/utils";
 import RightDrawer from "../components/Drawer";
 
 interface Estimation {
@@ -193,6 +195,8 @@ const Home: NextPage = () => {
     }
     return DEFAULT_FAVOURITES;
   });
+  const toast = useToast();
+  const toastShown = useRef(false);
   const geolocation = useGeolocation({ enableHighAccuracy: true });
   const nearestStopCode = getNearestStopForLocation(geolocation);
 
@@ -229,8 +233,19 @@ const Home: NextPage = () => {
 
   const fetchData = useCallback(async () => {
     const respuesta = await fetch("/api/paradas");
-    setInfoParadas(await respuesta.json());
-  }, []);
+    const respuestaJSON: ParadasAnswer = await respuesta.json();
+    if (isDataDeprecated(respuestaJSON.CargaFin) && !toastShown.current) {
+      toast({
+        title: "Información no actualizada",
+        description: `La información de llegada del siguiente vehículo a la parada no está actualizada.\nÚltima actualización disponible: ${respuestaJSON.cargaInicio}`,
+        status: "error",
+        isClosable: true,
+        duration: null,
+      });
+      toastShown.current = true;
+    }
+    setInfoParadas(respuestaJSON);
+  }, [toast]);
 
   useEffect(() => {
     fetchData();

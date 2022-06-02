@@ -38,3 +38,6 @@ export const STOPS_POSITION: { [key: string]: Coordinate } = {
   25: { latitude: 37.1475217370318, longitude: -3.6208474469023884 },
   26: { latitude: 37.14372460831325, longitude: -3.6271284057413506 },
 };
+
+export const DATE_FORMAT = "dd/MM/y H:mm:ss";
+export const MAX_MINUTES_AFTER_LAST_UPDATE = 2;

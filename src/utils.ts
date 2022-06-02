@@ -1,6 +1,12 @@
-import { STOPS_POSITION } from "./constants";
+import {
+  DATE_FORMAT,
+  MAX_MINUTES_AFTER_LAST_UPDATE,
+  STOPS_POSITION,
+} from "./constants";
 import { Coordinate } from "./types";
 import { EnrichedGeolocationCoordinates } from "./hooks/useGeolocation";
+import parse from "date-fns/parse";
+import differenceInMinutes from "date-fns/differenceInMinutes";
 
 function getDistanceFromLatLonInKm(
   positionA: Coordinate,
@@ -37,3 +43,11 @@ export const getNearestStopForLocation = (
       : currentValue
   ).key;
 };
+
+const getMinutesFromLastUpdate = (lastUpdate: string) => {
+  const lastUpdateTime = parse(lastUpdate, DATE_FORMAT, new Date());
+  return Math.abs(differenceInMinutes(lastUpdateTime, new Date()));
+};
+
+export const isDataDeprecated = (lastUpdate: string) =>
+  getMinutesFromLastUpdate(lastUpdate) > MAX_MINUTES_AFTER_LAST_UPDATE;
