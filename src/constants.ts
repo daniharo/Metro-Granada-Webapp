@@ -41,3 +41,4 @@ export const STOPS_POSITION: { [key: string]: Coordinate } = {
 
 export const DATE_FORMAT = "dd/MM/y H:mm:ss";
 export const MAX_MINUTES_AFTER_LAST_UPDATE = 2;
+export const UPDATE_INTERVAL_MS = 7000;
