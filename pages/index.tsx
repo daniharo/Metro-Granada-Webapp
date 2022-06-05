@@ -188,7 +188,9 @@ const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
   const router = useRouter();
   const [infoParadas, setInfoParadas] =
     useState<ParadasAnswer>(firstParadasAnswer);
-  const [busqueda, setBusqueda] = useState("");
+  const [busqueda, setBusqueda] = useState(
+    (router.query.search as string) ?? ""
+  );
   const [decimals, setDecimals] = useState(0);
   const {
     isOpen: drawerIsOpen,
@@ -209,12 +211,6 @@ const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
   const toastShown = useRef(false);
   const geolocation = useGeolocation({ enableHighAccuracy: true });
   const nearestStopCode = getNearestStopForLocation(geolocation);
-
-  useEffect(() => {
-    if (router.query.search) {
-      setBusqueda(router.query.search as string);
-    }
-  }, [router.query.search]);
 
   const handleFavStop = (stopCode: number) => {
     setFavouriteStops((prev) => {
