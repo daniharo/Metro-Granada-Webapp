@@ -1,4 +1,4 @@
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import React, {
   ChangeEventHandler,
   useCallback,
@@ -37,6 +37,7 @@ import useGeolocation from "../src/hooks/useGeolocation.js";
 import { getNearestStopForLocation, isDataDeprecated } from "../src/utils";
 import RightDrawer from "../components/Drawer";
 import { UPDATE_INTERVAL_MS } from "../src/constants";
+import { getParadasAnswer } from "../src/util/api/paradas";
 
 interface Estimation {
   minutes: number;
@@ -179,9 +180,14 @@ const StopRow: React.FC<IStopRowProps> = ({
   </Tr>
 );
 
-const Home: NextPage = () => {
+interface IHomeProps {
+  firstParadasAnswer: ParadasAnswer;
+}
+
+const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
   const router = useRouter();
-  const [infoParadas, setInfoParadas] = useState<ParadasAnswer | null>(null);
+  const [infoParadas, setInfoParadas] =
+    useState<ParadasAnswer>(firstParadasAnswer);
   const [busqueda, setBusqueda] = useState("");
   const [decimals, setDecimals] = useState(0);
   const {
@@ -189,14 +195,16 @@ const Home: NextPage = () => {
     onOpen: onOpenDrawer,
     onClose: onCloseDrawer,
   } = useDisclosure();
-  const [favouriteStops, setFavouriteStops] = useState<Set<number>>(() => {
-    if (typeof window === "undefined") return DEFAULT_FAVOURITES;
-    const localStorageItem = window.localStorage.getItem("favouriteStops");
-    if (localStorageItem) {
-      return new Set(JSON.parse(localStorageItem));
+  const [favouriteStops, setFavouriteStops] =
+    useState<Set<number>>(DEFAULT_FAVOURITES);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const localStorageItem = window.localStorage.getItem("favouriteStops");
+      if (localStorageItem) {
+        setFavouriteStops(new Set(JSON.parse(localStorageItem)));
+      }
     }
-    return DEFAULT_FAVOURITES;
-  });
+  }, []);
   const toast = useToast();
   const toastShown = useRef(false);
   const geolocation = useGeolocation({ enableHighAccuracy: true });
@@ -208,13 +216,6 @@ const Home: NextPage = () => {
     }
   }, [router.query.search]);
 
-  useEffect(() => {
-    window.localStorage.setItem(
-      "favouriteStops",
-      JSON.stringify(Array.from(favouriteStops))
-    );
-  }, [favouriteStops]);
-
   const handleFavStop = (stopCode: number) => {
     setFavouriteStops((prev) => {
       const copy = new Set(prev);
@@ -223,6 +224,10 @@ const Home: NextPage = () => {
       } else {
         copy.add(stopCode);
       }
+      window.localStorage.setItem(
+        "favouriteStops",
+        JSON.stringify(Array.from(copy))
+      );
       return copy;
     });
   };
@@ -250,7 +255,6 @@ const Home: NextPage = () => {
   }, [toast]);
 
   useEffect(() => {
-    fetchData();
     const interval = setInterval(fetchData, UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [fetchData]);
@@ -400,3 +404,11 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export const getServerSideProps: GetServerSideProps<IHomeProps> = async () => {
+  return {
+    props: {
+      firstParadasAnswer: JSON.parse(await getParadasAnswer()),
+    },
+  };
+};
