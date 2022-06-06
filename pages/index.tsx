@@ -9,7 +9,6 @@ import React, {
 import { ParadasAnswer } from "../src/types";
 import {
   Box,
-  Center,
   CloseButton,
   IconButton,
   Input,
@@ -17,7 +16,6 @@ import {
   InputLeftElement,
   InputRightElement,
   ScaleFade,
-  Spinner,
   Table,
   TableContainer,
   Tbody,
@@ -258,14 +256,6 @@ const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
     const interval = setInterval(fetchData, UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [fetchData]);
-
-  if (infoParadas === null) {
-    return (
-      <Center height="100vh">
-        <Spinner size="xl" />
-      </Center>
-    );
-  }
 
   const paradasProcesadas = processInfoParadas(infoParadas, favouriteStops);
 
