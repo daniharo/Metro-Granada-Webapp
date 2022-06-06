@@ -236,19 +236,23 @@ const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
 
   const fetchData = useCallback(async () => {
     const respuesta = await fetch("/api/paradas");
-    const respuestaJSON: ParadasAnswer = await respuesta.json();
-    if (isDataDeprecated(respuestaJSON.CargaFin) && !toastShown.current) {
-      toast({
-        title: "Información no actualizada",
-        description: `La información de llegada del siguiente vehículo a la parada no está actualizada.\nÚltima actualización disponible: ${respuestaJSON.cargaInicio}`,
-        status: "error",
-        isClosable: true,
-        duration: null,
-      });
+    setInfoParadas(await respuesta.json());
+  }, []);
+
+  useEffect(() => {
+    if (isDataDeprecated(infoParadas.CargaFin) && !toastShown.current) {
+      setTimeout(() => {
+        toast({
+          title: "Información no actualizada",
+          description: `La información de llegada del siguiente vehículo a la parada no está actualizada.\nÚltima actualización disponible: ${infoParadas.cargaInicio}`,
+          status: "error",
+          isClosable: true,
+          duration: null,
+        });
+      }, 0);
       toastShown.current = true;
     }
-    setInfoParadas(respuestaJSON);
-  }, [toast]);
+  }, [infoParadas.CargaFin, infoParadas.cargaInicio, toast]);
 
   useEffect(() => {
     const interval = setInterval(fetchData, UPDATE_INTERVAL_MS);
