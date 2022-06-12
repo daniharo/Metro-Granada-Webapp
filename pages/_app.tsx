@@ -25,7 +25,7 @@ const shadows = {
 
 const fonts = {
   body: "Encode-Sans, sans-serif",
-  heading: "Encode-Sans-Bold, serif",
+  heading: "Encode-Sans, sans-serif",
   mono: "Menlo, monospace",
 };
 
