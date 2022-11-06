@@ -203,6 +203,11 @@ const Home: NextPage = () => {
       }
     }
   }, []);
+  useEffect(() => {
+    if (typeof router.query.search === "string") {
+      setBusqueda(router.query.search);
+    }
+  }, [router.query.search]);
   const toast = useToast();
   const toastShown = useRef(false);
   const geolocation = useGeolocation({ enableHighAccuracy: true });
@@ -224,8 +229,15 @@ const Home: NextPage = () => {
     });
   };
 
-  const handleChangeBusqueda: ChangeEventHandler<HTMLInputElement> = (event) =>
-    setBusqueda(event.target.value);
+  const handleChangeBusqueda: ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    const newValue = event.target.value;
+    setBusqueda(newValue);
+    router.replace({
+      query: newValue ? { search: newValue } : undefined,
+    });
+  };
 
   const handleChangeDecimales: UseCounterProps["onChange"] = (_, value) =>
     setDecimals(value);
