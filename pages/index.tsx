@@ -302,9 +302,6 @@ const Home: NextPage = () => {
 
   return (
     <div className={classes.home}>
-      <Head>
-        <title>Metropolitano de Granada - Tiempos de paso (NO OFICIAL)</title>
-      </Head>
       <Box display="flex">
         <InputGroup mr={2}>
           <InputLeftElement pointerEvents="none">
