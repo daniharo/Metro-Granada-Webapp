@@ -1,4 +1,4 @@
-import type { GetServerSideProps, NextPage } from "next";
+import type { NextPage } from "next";
 import React, {
   ChangeEventHandler,
   useCallback,
@@ -9,6 +9,7 @@ import React, {
 import { ParadasAnswer } from "../src/types";
 import {
   Box,
+  chakra,
   CloseButton,
   IconButton,
   Input,
@@ -16,6 +17,7 @@ import {
   InputLeftElement,
   InputRightElement,
   ScaleFade,
+  Spinner,
   Table,
   TableContainer,
   Tbody,
@@ -35,7 +37,6 @@ import useGeolocation from "../src/hooks/useGeolocation.js";
 import { getNearestStopForLocation, isDataDeprecated } from "../src/utils";
 import RightDrawer from "../components/Drawer";
 import { UPDATE_INTERVAL_MS } from "../src/constants";
-import { getParadasAnswer } from "../src/util/api/paradas";
 
 interface Estimation {
   minutes: number;
@@ -178,14 +179,11 @@ const StopRow: React.FC<IStopRowProps> = ({
   </Tr>
 );
 
-interface IHomeProps {
-  firstParadasAnswer: ParadasAnswer;
-}
-
-const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
+const Home: NextPage = () => {
   const router = useRouter();
-  const [infoParadas, setInfoParadas] =
-    useState<ParadasAnswer>(firstParadasAnswer);
+  const [infoParadas, setInfoParadas] = useState<ParadasAnswer | undefined>(
+    undefined
+  );
   const [busqueda, setBusqueda] = useState(
     (router.query.search as string) ?? ""
   );
@@ -238,6 +236,7 @@ const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
   }, []);
 
   useEffect(() => {
+    if (!infoParadas) return;
     if (isDataDeprecated(infoParadas.CargaFin) && !toastShown.current) {
       setTimeout(() => {
         toast({
@@ -250,12 +249,27 @@ const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
       }, 0);
       toastShown.current = true;
     }
-  }, [infoParadas.CargaFin, infoParadas.cargaInicio, toast]);
+  }, [infoParadas, toast]);
 
   useEffect(() => {
+    fetchData();
     const interval = setInterval(fetchData, UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [fetchData]);
+
+  if (!infoParadas) {
+    return (
+      <chakra.div
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+        width="100%"
+      >
+        <Spinner size="lg" />
+      </chakra.div>
+    );
+  }
 
   const paradasProcesadas = processInfoParadas(infoParadas, favouriteStops);
 
@@ -394,11 +408,3 @@ const Home: NextPage<IHomeProps> = ({ firstParadasAnswer }) => {
 };
 
 export default Home;
-
-export const getServerSideProps: GetServerSideProps<IHomeProps> = async () => {
-  return {
-    props: {
-      firstParadasAnswer: JSON.parse(await getParadasAnswer()),
-    },
-  };
-};
