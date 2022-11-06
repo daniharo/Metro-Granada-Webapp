@@ -311,7 +311,6 @@ const Home: NextPage = () => {
             <SearchIcon color="gray.300" />
           </InputLeftElement>
           <Input
-            autoFocus={busqueda.length > 0}
             placeholder="Busca una parada"
             onChange={handleChangeBusqueda}
             value={busqueda}
