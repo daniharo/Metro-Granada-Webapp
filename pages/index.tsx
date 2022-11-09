@@ -31,7 +31,6 @@ import {
 import classes from "../styles/Home.module.css";
 import { StarIcon, HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
-import Head from "next/head";
 import { UseCounterProps } from "@chakra-ui/react";
 import useGeolocation from "../src/hooks/useGeolocation.js";
 import { getNearestStopForLocation, isDataDeprecated } from "../src/utils";
@@ -300,6 +299,13 @@ const Home: NextPage = () => {
   const showFavourites =
     busqueda.length === 0 && favouriteStopsObjects.length > 0;
 
+  const handleClearSearch = () => {
+    setBusqueda("");
+    router.replace({
+      query: undefined,
+    });
+  };
+
   return (
     <div className={classes.home}>
       <Box display="flex">
@@ -316,7 +322,7 @@ const Home: NextPage = () => {
             <InputRightElement>
               <CloseButton
                 aria-label="Borrar búsqueda"
-                onClick={() => setBusqueda("")}
+                onClick={handleClearSearch}
               />
             </InputRightElement>
           </ScaleFade>
