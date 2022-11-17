@@ -19,7 +19,8 @@
     "framer-motion": "^7.6.4",
     "next": "13.0.2",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "vercel": "^28.5.4"
   },
   "devDependencies": {
     "@types/node": "18.11.9",
