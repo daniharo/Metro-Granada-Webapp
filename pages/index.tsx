@@ -318,7 +318,11 @@ const Home: NextPage = () => {
             onChange={handleChangeBusqueda}
             value={busqueda}
           />
-          <ScaleFade initialScale={0.9} in={busqueda.length > 0}>
+          <ScaleFade
+            style={{ zIndex: 10 }}
+            initialScale={0.9}
+            in={busqueda.length > 0}
+          >
             <InputRightElement>
               <CloseButton
                 aria-label="Borrar búsqueda"
