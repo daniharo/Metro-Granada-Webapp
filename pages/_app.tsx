@@ -6,6 +6,7 @@ import { Encode_Sans_Condensed } from "@next/font/google";
 const encodeSansCondensed = Encode_Sans_Condensed({
   weight: ["400", "700"],
   subsets: ["latin"],
+  display: "fallback",
 });
 
 // 2. Extend the theme to include custom colors, fonts, etc
