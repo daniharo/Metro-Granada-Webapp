@@ -1,6 +1,12 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { Encode_Sans_Condensed } from "@next/font/google";
+
+const encodeSansCondensed = Encode_Sans_Condensed({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+});
 
 // 2. Extend the theme to include custom colors, fonts, etc
 const colors = {
@@ -24,8 +30,8 @@ const shadows = {
 };
 
 const fonts = {
-  body: "Encode-Sans, sans-serif",
-  heading: "Encode-Sans, sans-serif",
+  body: `${encodeSansCondensed.style.fontFamily}, sans-serif`,
+  heading: `${encodeSansCondensed.style.fontFamily}, sans-serif`,
   mono: "Menlo, monospace",
 };
 
